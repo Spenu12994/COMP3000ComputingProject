@@ -11,22 +11,27 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="style.css">
+        <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+        </script> 
     </head>
     <body>
         <div class="Container">
 
+            <button onclick="updateCharts()">Update Charts</button>
+
             <div id="classes">
                 <div class="Graph" id="waterLevel">
-
+                    <canvas id="waterChart" style="width:100%;max-width:700px"></canvas> 
                 </div>
 
                 <div class="Graph" id="pressureLevel">
-
+                    <canvas id="pressureChart" style="width:100%;max-width:700px"></canvas> 
                 </div>
 
 
                 <div class="Graph" id="lightLevel">
-
+                    <canvas id="lightChart" style="width:100%;max-width:700px"></canvas> 
                 </div>
             </div>
 
