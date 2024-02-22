@@ -7,10 +7,13 @@ let waterGuagePort = 2;
 let pressureGuagePort = 3;
 let pumpPort = 4;
 
-var date = new Date;
+
 
 const xValues = ["8:00","8:30","9:00","9:30","10:00","10:30","11:00","11:30"];
 const yValues = [7,8,8,9,9,9,10,11,14,14,15];
+const waterValues = [7,8,8,9,9,9,10,11,14,14,15];
+const pressureValues = [7,8,8,9,9,9,10,11,14,14,15];
+const lightValues = [7,8,8,9,9,9,10,11,14,14,15];
 
 const waterChart = new Chart(document.getElementById("waterChart"), {
     type: "line",
@@ -21,13 +24,13 @@ const waterChart = new Chart(document.getElementById("waterChart"), {
         lineTension: 0,
         backgroundColor: "rgba(0,0,255,1.0)",
         borderColor: "rgba(0,0,255,0.1)",
-        data: yValues
+        data: waterValues
       }]
     },
     options: {
       legend: {display: false},
       scales: {
-        yAxes: [{ticks: {min: 6, max:16}}],
+        yAxes: [{ticks: {min: 0, max:16}}],
       },
       title:{
         display: true,
@@ -46,13 +49,13 @@ const pressureChart = new Chart("pressureChart", {
         lineTension: 0,
         backgroundColor: "rgba(0,0,255,1.0)",
         borderColor: "rgba(0,0,255,0.1)",
-        data: yValues
+        data: pressureValues
       }]
     },
     options: {
       legend: {display: false},
       scales: {
-        yAxes: [{ticks: {min: 6, max:16}}],
+        yAxes: [{ticks: {min: 0, max:16}}],
       },
       title:{
         display: true,
@@ -71,13 +74,13 @@ const lightChart = new Chart("lightChart", {
         lineTension: 0,
         backgroundColor: "rgba(0,0,255,1.0)",
         borderColor: "rgba(0,0,255,0.1)",
-        data: yValues
+        data: lightValues
       }]
     },
     options: {
       legend: {display: false},
       scales: {
-        yAxes: [{ticks: {min: 6, max:16}}],
+        yAxes: [{ticks: {min: 0, max:16}}],
       },
       title:{
         display: true,
@@ -89,42 +92,66 @@ const lightChart = new Chart("lightChart", {
 
 
 // these functions were adapted from https://www.chartjs.org/docs/latest/developers/updates.html
-function addData(chart, label, newData) {
-    chart.data.labels.push(label);
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(newData);
-    });
-    chart.update();
-}
-
-function removeData(chart) {
-    chart.data.labels.pop();
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.pop();
-    });
-    chart.update();
-}
-
- 
-
- 
-
-
-function updateCharts(){
+function addData(chart, chartTxt, newData) {
     
+    switch(chartTxt){
+        case "waterChart":
+            waterValues.push(newData);
+            break;
+        case "pressureChart":
+            pressureValues.push(newData);
+            break;
+        case "lightChart":
+            lightValues.push(newData);
+            break;
+        default:
+            yValues.push(newData);
+    }
+    
+    chart.update();
+}
 
-    var minutes = date.getSeconds();
+function removeData(chart, chartTxt) {
+    switch(chartTxt){
+        case "waterChart":
+            waterValues.shift();
+            break;
+        case "pressureChart":
+            pressureValues.shift();
+            break;
+        case "lightChart":
+            lightValues.shift();
+            break;
+        default:
+            yValues.shift();
+    }
+    
+    chart.update();
+}
+
+ 
+
+ 
+
+
+function updateCharts(){// this should update with our data reading hardware every alloted time frame (such as every 30 minutes)
+    var date = new Date;
+    var minutes = date.getMinutes();
     var hours = date.getHours();
 
     var currTimeText = hours.toString() + ":" + minutes.toString();
 
-    addData(waterChart, currTimeText, Math.floor(Math.random() * 101));
-    addData(pressureChart, currTimeText, Math.floor(Math.random() * 101));
-    addData(lightChart, currTimeText, Math.floor(Math.random() * 101));
+    xValues.push(currTimeText);
+    xValues.shift();
 
-    removeData(waterChart);
-    removeData(pressureChart);
-    removeData(lightChart);
+    addData(waterChart, "waterChart",Math.floor(Math.random() * 16)); //math.random is used to simulate a response from our hardware, once implemented our data values from hardware will be inputted here instead
+    addData(pressureChart, "pressureChart", Math.floor(Math.random() * 16));
+    addData(lightChart,"lightChart",Math.floor(Math.random() * 16));
+
+    
+    removeData(waterChart, "waterChart");
+    removeData(pressureChart, "pressureChart");
+    removeData(lightChart,"lightChart");
 }
 
 function water(){
