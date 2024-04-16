@@ -1,10 +1,10 @@
 let lightLevel = 0;
 let waterLevel = 0;
-let pressureLevel = 0;
+let tempLevel = 0;
 
 let lightGuagePort = 1;
 let waterGuagePort = 2;
-let pressureGuagePort = 3;
+let tempGuagePort = 3;
 let pumpPort = 4;
 
 
@@ -12,7 +12,7 @@ let pumpPort = 4;
 const xValues = ["8:00","8:30","9:00","9:30","10:00","10:30","11:00","11:30"];
 const yValues = [7,8,8,9,9,9,10,11,14,14,15];
 const waterValues = [7,8,8,9,9,9,10,11,14,14,15];
-const pressureValues = [7,8,8,9,9,9,10,11,14,14,15];
+const tempValues = [23,24,22,20,24,25,19,21,23,22,24];
 const lightValues = [7,8,8,9,9,9,10,11,14,14,15];
 
 const waterChart = new Chart(document.getElementById("waterChart"), {
@@ -40,7 +40,7 @@ const waterChart = new Chart(document.getElementById("waterChart"), {
     }
 });
 
-const pressureChart = new Chart("pressureChart", {
+const tempChart = new Chart("tempChart", {
     type: "line",
     data: {
       labels: xValues,
@@ -49,17 +49,17 @@ const pressureChart = new Chart("pressureChart", {
         lineTension: 0,
         backgroundColor: "rgba(0,0,255,1.0)",
         borderColor: "rgba(0,0,255,0.1)",
-        data: pressureValues
+        data: tempValues
       }]
     },
     options: {
       legend: {display: false},
       scales: {
-        yAxes: [{ticks: {min: 0, max:16}}],
+        yAxes: [{ticks: {min: 0, max:50}}],
       },
       title:{
         display: true,
-        text: "Pressure Levels",
+        text: "Temperature Levels",
         fontSize: 16
       }
     }
@@ -98,8 +98,8 @@ function addData(chart, chartTxt, newData) {
         case "waterChart":
             waterValues.push(newData);
             break;
-        case "pressureChart":
-            pressureValues.push(newData);
+        case "tempChart":
+            tempValues.push(newData);
             break;
         case "lightChart":
             lightValues.push(newData);
@@ -116,8 +116,8 @@ function removeData(chart, chartTxt) {
         case "waterChart":
             waterValues.shift();
             break;
-        case "pressureChart":
-            pressureValues.shift();
+        case "tempChart":
+            tempValues.shift();
             break;
         case "lightChart":
             lightValues.shift();
@@ -145,12 +145,12 @@ function updateCharts(){// this should update with our data reading hardware eve
     xValues.shift();
 
     addData(waterChart, "waterChart",Math.floor(Math.random() * 16)); //math.random is used to simulate a response from our hardware, once implemented our data values from hardware will be inputted here instead
-    addData(pressureChart, "pressureChart", Math.floor(Math.random() * 16));
+    addData(tempChart, "tempChart", Math.floor(Math.random() * 16));
     addData(lightChart,"lightChart",Math.floor(Math.random() * 16));
 
     
     removeData(waterChart, "waterChart");
-    removeData(pressureChart, "pressureChart");
+    removeData(tempChart, "tempChart");
     removeData(lightChart,"lightChart");
 }
 
@@ -176,7 +176,7 @@ function getGraphInfo(){
 
     //lightLevel = lightGuagePort;
     //waterLevel = waterGuagePort;
-    //pressureLevel = pressureGuagePort;
+    //tempLevel = tempGuagePort;
 
 }
 
@@ -184,5 +184,5 @@ function updateGraphs(){
     //update the graph with get graph info
     //lightgraph.append = lightlevel
     //watergraph.append = waterlevel
-    //pressurelevel.append = pressurelevel
+    //templevel.append = templevel
 }

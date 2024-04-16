@@ -13,7 +13,7 @@ import time
 app=Flask(__name__)
 
 #setup pins
-watSen, lighSen= 3, 5
+watSen, lighSen, tempSen= 3, 5, 1
 
 rpi.setwarning(False)
 rpi.setmode(rpi.BOARD)
@@ -21,6 +21,7 @@ rpi.setmode(rpi.BOARD)
 #rpi setup our water sensor and ligh sensor with their pins
 rpi.setup(watSen, rpi.IN)
 rpi.setup(lighSen, rpi.IN)
+rpi.setup(tempSen, rpi.IN)
 
 #change 7 and 14 for our pins
 pump = Motor(7, 14)
@@ -28,6 +29,7 @@ pump = Motor(7, 14)
 
 waterLevel = rpi.input(watSen)
 lightLevel = rpi.input(lighSen)
+tempLevel = rpi.input(tempSen)
 
 
 
@@ -43,6 +45,11 @@ def index():
 @app.route('/lightLevel')
 def index():
     lightLevel = rpi.input(lighSen)
+    return render_template('index.html')
+
+@app.route('/tempLevel')
+def index():
+    tempLevel = rpi.input(tempSen)
     return render_template('index.html')
 
 @app.route('/water')
