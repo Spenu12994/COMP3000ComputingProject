@@ -7,88 +7,107 @@ let waterGuagePort = 2;
 let tempGuagePort = 3;
 let pumpPort = 4;
 
+const url = 'http://localhost:5000/'
 
 
-const xValues = ["8:00","8:30","9:00","9:30","10:00","10:30","11:00","11:30"];
+xValues = [];
 const yValues = [7,8,8,9,9,9,10,11,14,14,15];
-const waterValues = [7,8,8,9,9,9,10,11,14,14,15];
-const tempValues = [23,24,22,20,24,25,19,21,23,22,24];
-const lightValues = [7,8,8,9,9,9,10,11,14,14,15];
+waterValues = [];
+tempValues = [];
+lightValues = [];
 
-const waterChart = new Chart(document.getElementById("waterChart"), {
-    type: "line",
-    data: {
-      labels: xValues,
-      datasets: [{
-        fill: false,
-        lineTension: 0,
-        backgroundColor: "rgba(0,0,255,1.0)",
-        borderColor: "rgba(0,0,255,0.1)",
-        data: waterValues
-      }]
-    },
-    options: {
-      legend: {display: false},
-      scales: {
-        yAxes: [{ticks: {min: 0, max:16}}],
-      },
-      title:{
-        display: true,
-        text: "Water Levels",
-        fontSize: 16
-      }
-    }
-});
 
-const tempChart = new Chart("tempChart", {
-    type: "line",
-    data: {
-      labels: xValues,
-      datasets: [{
-        fill: false,
-        lineTension: 0,
-        backgroundColor: "rgba(0,0,255,1.0)",
-        borderColor: "rgba(0,0,255,0.1)",
-        data: tempValues
-      }]
-    },
-    options: {
-      legend: {display: false},
-      scales: {
-        yAxes: [{ticks: {min: 0, max:50}}],
-      },
-      title:{
-        display: true,
-        text: "Temperature Levels",
-        fontSize: 16
-      }
-    }
-});
 
-const lightChart = new Chart("lightChart", {
-    type: "line",
-    data: {
-      labels: xValues,
-      datasets: [{
-        fill: false,
-        lineTension: 0,
-        backgroundColor: "rgba(0,0,255,1.0)",
-        borderColor: "rgba(0,0,255,0.1)",
-        data: lightValues
-      }]
-    },
-    options: {
-      legend: {display: false},
-      scales: {
-        yAxes: [{ticks: {min: 0, max:16}}],
+function createCharts(waterArray, tempArray, lightArray, xValues){
+  waterChart = new Chart(document.getElementById("waterChart"), {
+      type: "line",
+      data: {
+        labels: xValues,
+        datasets: [{
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "rgba(0,0,255,1.0)",
+          borderColor: "rgba(0,0,255,0.1)",
+          data: waterArray
+        }]
       },
-      title:{
-        display: true,
-        text: "Light Levels",
-        fontSize: 16
+      options: {
+        legend: {display: false},
+        scales: {
+          yAxes: [{ticks: {min: 0, max:16}}],
+        },
+        title:{
+          display: true,
+          text: "Water Levels",
+          fontSize: 16
+        }
       }
-    }
-});
+  });
+
+  tempChart = new Chart("tempChart", {
+      type: "line",
+      data: {
+        labels: xValues,
+        datasets: [{
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "rgba(0,0,255,1.0)",
+          borderColor: "rgba(0,0,255,0.1)",
+          data: tempArray
+        }]
+      },
+      options: {
+        legend: {display: false},
+        scales: {
+          yAxes: [{ticks: {min: 0, max:50}}],
+        },
+        title:{
+          display: true,
+          text: "Temperature Levels",
+          fontSize: 16
+        }
+      }
+  });
+
+  lightChart = new Chart("lightChart", {
+      type: "line",
+      data: {
+        labels: xValues,
+        datasets: [{
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "rgba(0,0,255,1.0)",
+          borderColor: "rgba(0,0,255,0.1)",
+          data: lightArray
+        }]
+      },
+      options: {
+        legend: {display: false},
+        scales: {
+          yAxes: [{ticks: {min: 0, max:16}}],
+        },
+        title:{
+          display: true,
+          text: "Light Levels",
+          fontSize: 16
+        }
+      }
+  });
+}
+
+//Initiate Page
+fetch(url + '/values')
+.then(response=>response.json())
+.then(json =>{
+      console.log(json);
+      console.log(JSON.stringify(json));
+      createCharts(json.water, json.temp, json.light, json.xVals)
+      waterValues = json.water;
+      tempValues = json.temp;
+      lightValues = json.light;
+      xValues = json.xVals;
+})
+
 
 
 // these functions were adapted from https://www.chartjs.org/docs/latest/developers/updates.html
@@ -134,29 +153,45 @@ function removeData(chart, chartTxt) {
  
 
 
-function updateCharts(){// this should update with our data reading hardware every alloted time frame (such as every 30 minutes)
-    var date = new Date;
-    var minutes = date.getMinutes();
-    var hours = date.getHours();
-
-    var currTimeText = hours.toString() + ":" + minutes.toString();
+function updateCharts(){//this should update with our data reading hardware every alloted time frame (such as every 30 minutes)
+    fetch(url + '/update')
+    .then(response=>response.json())
+    .then(json =>{
+    
+    var currTimeText = json.time;
 
     xValues.push(currTimeText);
     xValues.shift();
 
-    addData(waterChart, "waterChart",Math.floor(Math.random() * 16)); //math.random is used to simulate a response from our hardware, once implemented our data values from hardware will be inputted here instead
-    addData(tempChart, "tempChart", Math.floor(Math.random() * 16));
-    addData(lightChart,"lightChart",Math.floor(Math.random() * 16));
+    addData(waterChart, "waterChart", json.water); //math.random is used to simulate a response from our hardware, once implemented our data values from hardware will be inputted here instead
+    addData(tempChart, "tempChart", json.temp);
+    addData(lightChart,"lightChart", json.light);
 
     
     removeData(waterChart, "waterChart");
     removeData(tempChart, "tempChart");
     removeData(lightChart,"lightChart");
+  })
 }
 
+
+
+
 function water(){
-    //enter code here to activate the watering system
-    activate(pumpPort)
+    const waterUrl = url + '/water'
+    fetch(waterUrl)
+    .then(response=>response.json())
+    .then(json =>{
+      console.log(json);
+      console.log(JSON.stringify(json));
+
+      if (json.success == 'yes'){
+        console.log("Watered Successfully");
+      }
+      else{
+        console.log("Watering Failed");
+      }
+    })
 }
 
 function activate(portNum){
